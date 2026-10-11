@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <title>Ultra Demonlist</title>
+    <style>
+      :root {
+        --bg: #0b0b0b;
+        --panel: #161616;
+        --accent: #ff4d4d;
+        --text: #e0e0e0;
+        --dim: #555;
+      }
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      .menu {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 2px solid #222;
+        background: var(--panel);
+      }
+      .logo {
+        font-weight: bold;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      .menu-links a {
+        color: var(--text);
+        text-decoration: none;
+        margin-right: 20px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+      }
+      .menu-links a:hover { color: var(--accent); }
+      
+      button {
+        cursor: pointer;
+        border: 1px solid var(--accent);
+        background: transparent;
+        color: var(--accent);
+        padding: 6px 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: 0.3s;
+      }
+      button:hover {
+        background: var(--accent);
+        color: #000;
+      }
+
+      .container {
+        max-width: 700px;
+        margin: 30px auto;
+        padding: 0 20px;
+      }
+
+      h2 {
+        color: var(--accent);
+        border-left: 5px solid var(--accent);
+        padding-left: 12px;
+        margin-top: 40px;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+      }
+
+      ul { list-style: none; padding: 0; }
+      li {
+        background: var(--panel);
+        border: 1px solid #222;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+      }
+      .rank {
+        font-weight: bold;
+        color: var(--accent);
+        min-width: 32px;
+        font-size: 1.1rem;
+      }
+      .name {
+        flex-grow: 1;
+        font-size: 1.05rem;
+      }
+      .author {
+        color: var(--dim);
+        font-size: 0.85rem;
+        margin-left: 16px;
+      }
+
+      /* Модальное окно входа */
+      #login-modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.9);
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .login-box {
+        background: #111;
+        padding: 30px;
+        border: 2px solid var(--accent);
+        text-align: center;
+      }
+      input {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background: #000;
+        border: 1px solid #444;
+        color: white;
+        box-sizing: border-box;
+      }
+
+      /* Форма добавления */
+      #add-form {
+        display: none;
+        background: #111;
+        padding: 20px;
+        border: 1px dashed var(--accent);
+        margin-bottom: 20px;
+      }
+      #add-form input {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        background: #000;
+        border: 1px solid #444;
+        color: white;
+      }
+
+      /* Класс для "заблокированного" вида основного листа */
+      .locked-list {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="menu">
+      <div class="logo">ULTRA DEMONLIST</div>
+      <div class="menu-links">
+        <a href="#future">Список будущих демонов</a>
+        <a href="#main">Основной лист</a>
+      </div>
+      <button id="login-btn" onclick="openLogin()">Авторизоваться</button>
+    </div>
+
+    <!-- Модальное окно входа -->
+    <div id="login-modal">
+      <div class="login-box">
+        <h3>Вход в систему</h3>
+        <p style="color:#aaa; margin-bottom:15px;">Введи любые данные для входа</p>
+        <input type="text" id="username" placeholder="Придумай ник">
+        <input type="password" id="password" placeholder="Придумай пароль">
+        <button onclick="login()">Войти</button>
+      </div>
+    </div>
+
+    <div class="container">
+      
+      <!-- Форма добавления своего уровня -->
+      <div id="add-form">
+        <h3>Создать свой уровень</h3>
+        <input type="text" id="new-name" placeholder="Название (например, Erebus)">
+        <input type="text" id="new-author" placeholder="Автор (например, TyDev)">
+        <button onclick="addLevel()">Добавить уровень</button>
+        <button onclick="closeAddForm()" style="margin-top:10px;">Закрыть</button>
+      </div>
+
+      <!-- Основной список -->
+      <h2 id="main">Основной демонлист</h2>
+      <ul id="main-list">
+        <li>
+          <span class="rank">#1</span>
+          <span class="name">GREIF</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#2</span>
+          <span class="name">society</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#3</span>
+          <span class="name">Thinking Space II</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#4</span>
+          <span class="name">Flamewall</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#5</span>
+          <span class="name">Artemis 13</span>
+          <span class="author">Artermis</span>
+        </li>
+        <li>
+          <span class="rank">#6</span>
+          <span class="name">Amethyst</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#7</span>
+          <span class="name">Green Bullet</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#8</span>
+          <span class="name">Orbit</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#9</span>
+          <span class="name">Antarctic Lights</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#10</span>
+          <span class="name">BOOBAWAMBA</span>
+          <span class="author">Комьюнити</span>
+        </li>
+      </ul>
+
+      <!-- Будущие демоны -->
+      <h2 id="future">Future Demonlist</h2>
+      <ul id="future-list">
+        <li>
+          <span class="rank">#1</span>
+          <span class="name">Sakupen End</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#2</span>
+          <span class="name">Heliopolis</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#3</span>
+          <span class="name">GREIF</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#4</span>
+          <span class="name">Sweepeng Demon II</span>
+          <span class="author">Комьюнити</span>
+        </li>
+        <li>
+          <span class="rank">#5</span>
+          <span class="name">Exasperation</span>
+          <span class="author">Комьюнити</span>
+        </li>
+      </ul>
+
+      <!-- Твой отдельный список (появляется после входа) -->
+      <h2 id="my-list-header" style="display:none;">My Demonlist</h2>
+      <ul id="my-list" style="display:none; list-style:none; padding:0;">
+        <!-- Сюда будут добавляться твои уровни -->
+      </ul>
+    </div>
+
+    <script>
+      let isLoggedIn = false;
+      let userNick = "";
+
+      function openLogin() {
+        document.getElementById('login-modal').style.display = 'flex';
+      }
+
+      function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if (username && password) {
+          isLoggedIn = true;
+          userNick = username;
+          
+          const btn = document.getElementById('login-btn');
+          btn.innerText = "Профиль: " + username;
+          btn.onclick = function() {
+            alert("Ты залогинен как: " + userNick + "\nСоздавай свои уровни!");
+          };
+
+          // Добавляем кнопку «Создать свой демонлист»
+          const menuLinks = document.querySelector('.menu-links');
+          const createBtn = document.createElement('button');
+          createBtn.innerText = "Создать свой демонлист";
+          createBtn.onclick = openAddForm;
+          menuLinks.appendChild(createBtn);
+
+          // Показываем твой отдельный список
+          document.getElementById('my-list-header').style.display = 'block';
+          document.getElementById('my-list').style.display = 'block';
+
+          alert("Успешный вход! Теперь ты можешь добавлять уровни в свой отдельный список.");
+          document.getElementById('login-modal').style.display = 'none';
+        } else {
+          alert("Введи ник и пароль!");
+        }
+      }
+
+      function openAddForm() {
+        if (!isLoggedIn) {
+          openLogin();
+          return;
+        }
+        document.getElementById('add-form').style.display = 'block';
+      }
+
+      function closeAddForm() {
+        document.getElementById('add-form').style.display = 'none';
+      }
+
+      function addLevel() {
+        const name = document.getElementById('new-name').value;
+        const author = document.getElementById('new-author').value;
+
+        if (name && author) {
+          const myList = document.getElementById('my-list');
+          const count = myList.children.length + 1;
+
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span class="rank">${count}</span>
+            <span class="name">${name}</span>
+            <span class="author">${author}</span>
+          `;
+          myList.appendChild(li);
+
+          alert("Уровень добавлен в My Demonlist!");
+          closeAddForm();
+          document.getElementById('new-name').value = '';
+          document.getElementById('new-author').value = '';
+        } else {
+          alert("Заполни название и автора!");
+        }
+      }
+    </script>
+  </body>
+</html>
